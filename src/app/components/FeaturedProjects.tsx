@@ -29,19 +29,19 @@ interface Project {
 const featuredProjects: Project[] = [
     {
         id: '1',
-        name: 'I Must Obey',
-        category: 'Game',
-        description: 'An immersive fps game with deep mental impacts',
-        image: '/imustobey.png',
-        url: ''
-    },
-    {
-        id: '2',
         name: 'Shroom Engine',
         category: 'Tool',
         description: 'Lightweight game engine built for rapid prototyping and experimental gameplay',
         image: '/enginepreview.jpg',
         url: '/engine'
+    },
+    {
+        id: '2',
+        name: 'I Must Obey',
+        category: 'Game',
+        description: 'An immersive fps game with deep mental impacts',
+        image: '/imustobey.png',
+        url: ''
     },
 ];
 
