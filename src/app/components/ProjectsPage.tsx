@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Gamepad2, Globe, Sparkles, Wrench } from 'lucide-react';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 type CategoryType = 'All' | 'Games' | 'Websites' | 'Tools' | 'Experiments';
 interface Project {
@@ -52,10 +53,18 @@ const getCategoryIcon = (category: CategoryType) => {
 };
 
 export function ProjectsPage() {
+    const searchParams = useSearchParams();
+    const urlCategory = searchParams.get("category") as CategoryType | null
+
     const [activeFilter, setActiveFilter] = useState<CategoryType>('All');
 
-    const filters: CategoryType[] = ['All', 'Games', 'Websites', 'Tools', 'Experiments'];
+    useEffect(() => {
+        if (urlCategory && ["Games", "Websites", "Tools", "Experiments"].includes(urlCategory)) {
+            setActiveFilter(urlCategory as CategoryType);
+        }
+    }, [urlCategory]);
 
+    const filters: CategoryType[] = ['All', 'Games', 'Websites', 'Tools', 'Experiments'];
     const filteredProjects = activeFilter === 'All' 
         ? projects 
         : projects.filter(project => project.category === activeFilter);

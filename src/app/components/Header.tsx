@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 export function Header() {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const location = usePathname();
+
+    const pathname = usePathname();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+    const [indicator, setIndicator] = useState({ x: 0, width: 0 });
 
     const navigation = [
         { name: "Home", path: "/" },
@@ -17,12 +21,27 @@ export function Header() {
     ];
 
     const isActive = (path: string) => {
-        return location === path;
+        return pathname === path;
     }
 
+    useLayoutEffect(() => {
+        const activeEl = itemRefs.current[pathname];
+        const containerEl = containerRef.current;
+
+        if (activeEl && containerEl) {
+            const a = activeEl.getBoundingClientRect();
+            const c = containerEl.getBoundingClientRect();
+
+            setIndicator({
+                x: a.left - c.left,
+                width: a.width,
+            });
+        }
+    }, [pathname]);
+
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-(--shroomlight-bg)/90 border-b border-(--shroomlight-surface)/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-(--shroomlight-bg)/90 backdrop-blur-md border-b border-(--shroomlight-surface)/30">
+            <div className="max-w-7xl mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link
@@ -42,38 +61,39 @@ export function Header() {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center gap-8">
+                    <div
+                        ref={containerRef}
+                        className="relative hidden md:flex items-center gap-8"
+                    >
+                        {/* Active Rect */}
+                        <motion.div
+                            className="absolute top-1/2 -translate-y-1/2 h-10 rounded-lg bg-(--shroomlight-surface)"
+                            animate={{ x: indicator.x, width: indicator.width }}
+                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        />
+
                         {navigation.map((item) => {
                             const active = isActive(item.path);
 
                             return (
                                 <Link
-                                    key={item.name}
+                                    key={item.path}
                                     href={item.path}
-                                    className={`
-                                        relative inline-flex items-center
-                                        px-4 py-2 rounded-lg transition-all
-                                        ${active
-                                            ? 'text-(--shroomlight-light)'
-                                            : 'text-(--shroomlight-accent-1) hover:text-(--shroomlight-light)'
-                                        }`
-                                    }
-                                    style={{ fontFamily: 'var(--font-body)' }}
+                                    ref={(el) => {
+                                        itemRefs.current[item.path] = el;
+                                    }}
+                                    className={`relative z-10 px-4 py-2 rounded-lg transition-colors ${
+                                        pathname === item.path
+                                        ? "text-(--shroomlight-light)"
+                                        : "text-(--shroomlight-accent-1) hover:text-(--shroomlight-light)"
+                                    }`}
                                 >
-                                    {active && (
-                                        <motion.div 
-                                            layoutId="activeNav"
-                                            className="absolute inset-0 -z-10 rounded-lg bg-(--shroomlight-surface)"
-                                            transition={{type: "spring", bounce: 0.2, duration: 0.6 }}
-                                        />
-                                    )}
-                                    
                                     {item.name}
                                 </Link>
-                            );                            
+                            );
                         })}
-                    </nav>
-                    
+                    </div>
+
                     {/* Mobile menu Navigation */}
                     <button 
                         onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
@@ -85,39 +105,40 @@ export function Header() {
                         }
                     </button>
                 </div>
-
-                {/* Mobile Navigation */}
-                <AnimatePresence>
-                    {isMobileMenuOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="md:hidden border-t border-(--shroomlight-surface)/30 bg-(--shroomlight-bg)"
-                        >
-                            <nav className="px-4 py-4 flex flex-col gap-2">
-                            {navigation.map((item) => (
-                                <Link
-                                    key={item.name}
-                                    href={item.path}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className={`block w-full text-left px-4 py-3 rounded-lg transition-all ${
-                                        isActive(item.path)
-                                        ? 'bg-(--shroomlight-surface) text-(--shroomlight-light)'
-                                        : 'text-(--shroomlight-accent-1) hover:bg-(--shroomlight-surface)/50 hover:text-(--shroomlight-light)'
-                                    }`}
-                                    style={{ fontFamily: 'var(--font-body)' }}
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
-                            </nav>
-
-                        </motion.div>
-                    )}
-                </AnimatePresence>
             </div>
-        </header>
-    );
 
+            {/* Mobile Navigation */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="md:hidden border-t border-(--shroomlight-surface)/30 bg-(--shroomlight-bg)"
+                    >
+                        <div className="px-4 py-4 space-y-2">
+                            {navigation.map((item) => {
+                                const active = isActive(item.path);
+                            
+                                return (
+                                    <Link
+                                        href={item.path}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className={`block w-full text-left px-4 py-3 rounded-lg transition-all ${
+                                            active
+                                            ? 'bg-(--shroomlight-surface) text-(--shroomlight-light)'
+                                            : 'text-(--shroomlight-accent-1) hover:bg-(--shroomlight-surface)/50 hover:text-(--shroomlight-light)'
+                                        }`}
+                                        style={{ fontFamily: 'var(--font-body)' }}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </nav>
+    );
 }
