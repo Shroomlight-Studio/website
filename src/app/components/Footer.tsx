@@ -32,22 +32,22 @@ export function Footer() {
                         </h4>
                         <ul className="space-y-2 text-sm text-(--shroomlight-accent-1)" style={{ fontFamily: 'var(--font-body)' }}>
                             <li>
-                                <a href="#" className="hover:text-(--shroomlight-primary) transition-colors">
+                                <a href="/projects?category=Games" className="hover:text-(--shroomlight-primary) transition-colors">
                                     Games
                                 </a>
                             </li>
                             <li>
-                                <a href="/engine" className="hover:text-(--shroomlight-primary) transition-colors">
-                                    Shroom Engine
+                                <a href="/projects?category=Websites" className="hover:text-(--shroomlight-primary) transition-colors">
+                                    Websites
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-(--shroomlight-primary) transition-colors">
+                                <a href="/projects?category=Tools" className="hover:text-(--shroomlight-primary) transition-colors">
                                     Tools
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-(--shroomlight-primary)] transition-colors">
+                                <a href="/projects?category=Experiments" className="hover:text-(--shroomlight-primary)] transition-colors">
                                     Experiments
                                 </a>
                             </li>
