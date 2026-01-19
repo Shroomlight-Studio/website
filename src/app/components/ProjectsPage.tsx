@@ -117,94 +117,99 @@ export function ProjectsPage() {
                 </div>
 
                 {/* Projects Grid */}
-                <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    <AnimatePresence mode="popLayout">
-                        {filteredProjects.map((project) => {
-                        const Icon = getCategoryIcon(project.category);
-                        return (
-                            <motion.div
-                                key={project.id}
-                                layout
-                                initial={{ opacity: 0, scale: 0.97 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.97 }}
-                                transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className="group relative bg-(--shroomlight-surface) rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-(--shroomlight-primary)/20 transition-all duration-300 border border-(--shroomlight-primary)/20 hover:border-(--shroomlight-primary)/50"
-                            >
-                                {/* Image */}
-                                <div className="relative h-48 overflow-hidden">
-                                    <img
-                                        src={project.image}
-                                        alt={project.name}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                    />
-                                    <div className="absolute inset-0 bg-linear-to-t from-(--shroomlight-surface) to-transparent opacity-60" />
-                                </div>
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={activeFilter}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3}}
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+                        >
+                            {filteredProjects.map((project) => {
+                                const Icon = getCategoryIcon(project.category);
+                        
+                                return (
+                                    <div key={project.id} className="group relative bg-(--shroomlight-surface) rounded-2xl overflow-hidden transition-all duration-300 border border-(--shroomlight-primary)/20 hover:border-(--shroomlight-primary) hover:shadow-xl">
+                                        {/* Image */}
+                                        <div className="relative h-48 overflow-hidden">
+                                            <img
+                                                src={project.image}
+                                                alt={project.name}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                            />
+                                            <div className="absolute inset-0 bg-linear-to-t from-(--shroomlight-surface) to-transparent opacity-60" />
+                                        </div>
+                                        {/* Content */}
+                                        <div className="p-6 space-y-4">
+                                            <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2 px-3 py-1 bg-(--shroomlight-glow)/20 rounded-full border border-(--shroomlight-primary)/30">
+                                                <Icon className="w-4 h-4 text-(--shroomlight-primary)" />
+                                                <span 
+                                                    className="text-sm text-(--shroomlight-accent-1)"
+                                                    style={{ fontFamily: 'var(--font-body)' }}
+                                                >
+                                                {project.category}
+                                                </span>
+                                            </div>
+                                            {project.url ? (
+                                                <a
+                                                    href={project.url} // the link you want to redirect to
+                                                    target="_blank" // opens in a new tab
+                                                    rel="noopener noreferrer" // security best practice
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <ExternalLink className="w-5 h-5 text-(--shroomlight-accent-1) opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </a>
+                                            ) : (
+                                                <span
+                                                    className="text-xs text-(--shroomlight-accent-2) italic opacity-70"
+                                                    style={{ fontFamily: 'var(--font-body)' }}
+                                                >
+                                                    Not yet public
+                                                </span>
+                                            )}
+                                            </div>
 
-                                {/* Content */}
-                                <div className="p-6 space-y-4">
-                                    <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 px-3 py-1 bg-(--shroomlight-glow)/20 rounded-full border border-(--shroomlight-primary)/30">
-                                        <Icon className="w-4 h-4 text-(--shroomlight-primary)" />
-                                        <span 
-                                            className="text-sm text-(--shroomlight-accent-1)"
-                                            style={{ fontFamily: 'var(--font-body)' }}
-                                        >
-                                        {project.category}
-                                        </span>
-                                    </div>
-                                    {project.url ? (
-                                        <a
-                                            href={project.url} // the link you want to redirect to
-                                            target="_blank" // opens in a new tab
-                                            rel="noopener noreferrer" // security best practice
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <ExternalLink className="w-5 h-5 text-(--shroomlight-accent-1) opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        </a>
-                                    ) : (
-                                        <span
-                                            className="text-xs text-(--shroomlight-accent-2) italic opacity-70"
-                                            style={{ fontFamily: 'var(--font-body)' }}
-                                        >
-                                            Not yet public
-                                        </span>
-                                    )}
-                                    </div>
+                                            <h3 
+                                                className="text-xl sm:text-2xl font-bold text-(--shroomlight-light)"
+                                                style={{ fontFamily: 'var(--font-heading)' }}
+                                            >
+                                                {project.name}
+                                            </h3>
 
-                                    <h3 
-                                        className="text-xl sm:text-2xl font-bold text-(--shroomlight-light)"
-                                        style={{ fontFamily: 'var(--font-heading)' }}
-                                    >
-                                        {project.name}
-                                    </h3>
-
-                                    <p 
-                                        className="text-(--shroomlight-accent-1) text-sm sm:text-base"
-                                        style={{ fontFamily: 'var(--font-body)' }}
-                                    >
-                                        {project.description}
-                                    </p>
-
-                                    {/* Tags */}
-                                    <div className="flex flex-wrap gap-2">
-                                        {project.tags.map((tag) => (
-                                            <span
-                                                key={tag}
-                                                className="px-2 py-1 bg-(--shroomlight-bg)/50 rounded text-xs text-(--shroomlight-accent-2)"
+                                            <p 
+                                                className="text-(--shroomlight-accent-1) text-sm sm:text-base"
                                                 style={{ fontFamily: 'var(--font-body)' }}
                                             >
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
+                                                {project.description}
+                                            </p>
 
-                                {/* Glow effect on hover */}
-                                <div className="absolute inset-0 bg-linear-to-r from-(--shroomlight-primary)/0 via-(--shroomlight-primary)/5 to-(--shroomlight-primary)/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                            </motion.div>
-                        );
-                        })}
+                                            {/* Tags */}
+                                            <div className="flex flex-wrap gap-2">
+                                                {project.tags.map((tag) => (
+                                                    <span
+                                                        key={tag}
+                                                        className="px-2 py-1 bg-(--shroomlight-bg)/50 rounded text-xs text-(--shroomlight-accent-2)"
+                                                        style={{ fontFamily: 'var(--font-body)' }}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Glow effect on hover */}
+                                        <div className="absolute inset-0 bg-linear-to-r from-(--shroomlight-primary)/0 via-(--shroomlight-primary)/5 to-(--shroomlight-primary)/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                    </div>
+                                );
+                            })}
+                        </motion.div>                        
                     </AnimatePresence>
                 </motion.div>
             </div>
