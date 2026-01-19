@@ -65,7 +65,7 @@ export function EnginePreview() {
                                     transition={{ delay: index * 0.1 }}
                                     className="flex items-start gap-4 p-4 rounded-xl bg-(--shroomlight-surface)/50 border border-(--shroomlight-primary)/10 hover:border-(--shroomlight-primary)/30 transition-all"
                                 >
-                                    <div className="w-12 h-12 rounded-lg bg-linear-to-br from-(--shroomlight-primary) to-(--shroomlight-glow) flex items-center justify-center shadow-lg shadow-(--shroomlight-glow)/20 flex-shrink-0">
+                                    <div className="w-12 h-12 rounded-lg bg-linear-to-br from-(--shroomlight-primary) to-(--shroomlight-glow) flex items-center justify-center shadow-lg shadow-(--shroomlight-glow)/20 shrink-0">
                                         <Icon className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
