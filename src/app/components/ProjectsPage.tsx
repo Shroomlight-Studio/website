@@ -31,7 +31,7 @@ const projects: Project[] = [
         name: 'I Must Obey',
         category: 'Games',
         description: 'An immersive fps game with deep mental impacts',
-        image: '/enginepreview.jpg',
+        image: '/imustobey.png',
         url: '',
         tags: ['FPS', 'Narrative Driven', 'Hell'],
     },
