@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../styles/index.css";
+import { Header } from "./components/Header";
 
 export const metadata: Metadata = {
   title: "Shroomlight Studio",
@@ -13,8 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body>
-        {children}
+      <body className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1">
+          {children}
+        </main>
       </body>
     </html>
   );
