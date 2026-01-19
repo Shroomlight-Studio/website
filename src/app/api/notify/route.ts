@@ -1,36 +1,58 @@
 export const runtime = 'edge';
 
-import { NextRequest, NextResponse } from "next/server";
-import { SMTPClient } from "emailjs";
-
-export async function POST(request: NextRequest) {
-    const { email } = await request.json();
-
-    if (!email) {
-        return NextResponse.json({ error: "Email is required" }, { status: 400 });
-    }
-
+export async function POST(req: Request) {
     try {
-        const client = new SMTPClient({
-            user: process.env.EMAIL_USER,
-            password: process.env.EMAIL_PASS,
-            host: "smtp.gmail.com",
-            ssl: true,
+        const { email } = await req.json();
+
+        if (!email) {
+            return new Response(
+                JSON.stringify({ error: "Email is required" }),
+                { status: 400, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        // SendGrid API request
+        const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.SENDGRID_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                personalizations: [
+                    {
+                        to: [{ email: "contact@shroomlightstudio.com" }],
+                        subject: "Shroom Engine Notify List Member"
+                    }
+                ],
+                from: {
+                    email: process.env.SENDGRID_EMAIL,
+                    name: "Shroomlight Studio Notify"
+                },
+                content: [
+                    { type: "text/plain", value: `New notify request: ${email}` },
+                    { type: "text/html", value: `<p>New notify request: <strong>${email}</strong></p>` }
+                ]
+            }),
         });
 
-        await client.sendAsync({
-            from: `"Shroomlight Studio Notify" <${process.env.EMAIL_USER}>`,
-            to: "contact@shroomlightstudio.com",
-            subject: "Shroom Engine Notify List Member",
-            text: `New notify request: ${email}`,
-            attachment: [
-                { data: `<p>New notify request: <strong>${email}</strong></p>`, alternative: true },
-            ],
-        });
+        if (!response.ok) {
+            console.error(await response.text());
+            return new Response(
+                JSON.stringify({ error: "Failed to send email" }),
+                { status: 500, headers: { "Content-Type": "application/json" } }
+            );
+        }
 
-        return NextResponse.json({ success: true });
+        return new Response(
+            JSON.stringify({ success: true }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+        );
     } catch (err) {
         console.error(err);
-        return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+        return new Response(
+            JSON.stringify({ error: "Unexpected server error" }),
+            { status: 500, headers: { "Content-Type": "application/json" } }
+        );
     }
 }
