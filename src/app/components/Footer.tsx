@@ -1,4 +1,4 @@
-import { Mail, Twitter } from "lucide-react"
+import { Mail } from "lucide-react"
 import { SiDiscord, SiGithub, SiX } from "react-icons/si";
 
 export function Footer() {
