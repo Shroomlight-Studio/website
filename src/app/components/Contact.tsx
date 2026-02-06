@@ -62,7 +62,7 @@ export function Contact() {
                                 className="px-8 py-4 bg-(--shroomlight-surface) rounded-xl text-(--shroomlight-light) font-semibold hover:bg-(--shroomlight-surface)/80 transition-all border border-(--shroomlight-primary)/50 hover:border-(--shroomlight-primary) hover:shadow-md w-full sm:w-auto text-center"
                                 style={{ fontFamily: 'var(--font-heading)' }}
                             >
-                                hello@shroomlight.studio
+                                contact@shroomlightstudio.com
                             </a>
                         </div>
 
