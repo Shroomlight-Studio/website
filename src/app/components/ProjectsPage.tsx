@@ -1,9 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ExternalLink, Gamepad2, Globe, Sparkles, Wrench } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import Image from "next/image";
+import { HiOutlineDesktopComputer, HiOutlineGlobeAlt, HiOutlineCog, HiOutlineSparkles } from "react-icons/hi";
+
 
 type CategoryType = 'All' | 'Games' | 'Websites' | 'Tools' | 'Experiments';
 interface Project {
@@ -35,37 +37,47 @@ const projects: Project[] = [
         url: '',
         tags: ['FPS', 'Narrative Driven', 'Hell'],
     },
+    {
+        id: '3',
+        name: 'Lorn eSport',
+        category: 'Websites',
+        description: "Official website for the Lorn eSport team.",
+        image: '/lornesport.png',
+        url: 'https://lornesport.com',
+        tags: ['Next.js', 'Supabase', 'Resend']
+    }
 ];
 
 const getCategoryIcon = (category: CategoryType) => {
     switch (category) {
     case 'Games':
-        return Gamepad2;
+        return HiOutlineDesktopComputer;
     case 'Websites':
-        return Globe;
+        return HiOutlineGlobeAlt;
     case 'Tools':
-        return Wrench;
+        return HiOutlineCog;
     case 'Experiments':
-        return Sparkles;
+        return HiOutlineSparkles;
     default:
-        return Gamepad2;
+        return HiOutlineDesktopComputer;
     }
 };
 
 export function ProjectsPage() {
     const router = useRouter();
     const pathname = usePathname();
-    const [activeFilter, setActiveFilter] = useState<CategoryType>('All');
 
-    useEffect(() => {
+    const getInitialFilter = (): CategoryType => {
+        if (typeof window === "undefined") return "All"; // SSR fallback
         const params = new URLSearchParams(window.location.search);
-        const category = params.get('category') as CategoryType | null;
-        if (category && ['Games','Websites','Tools','Experiments'].includes(category)) {
-            setActiveFilter(category);
-        } else {
-            setActiveFilter('All');
+        const category = params.get("category") as CategoryType | null;
+        if (category && ["Games", "Websites", "Tools", "Experiments"].includes(category)) {
+            return category;
         }
-    }, []);
+        return "All";
+    };
+
+    const [activeFilter, setActiveFilter] = useState<CategoryType>(getInitialFilter());
 
     const filters: CategoryType[] = ['All', 'Games', 'Websites', 'Tools', 'Experiments'];
     const filteredProjects = activeFilter === 'All' 
@@ -103,7 +115,7 @@ export function ProjectsPage() {
                             <button
                                 key={filter}
                                 onClick={() => setFilter(filter)}
-                                className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                                className={`cursor-pointer px-6 py-3 rounded-full font-semibold transition-all ${
                                 activeFilter === filter
                                     ? 'bg-linear-to-r from-(--shroomlight-primary) to-(--shroomlight-glow) text-white shadow-lg shadow-(--shroomlight-primary)/30'
                                     : 'bg-(--shroomlight-surface) text-(--shroomlight-accent-1) hover:bg-(--shroomlight-surface)/80 border border-(--shroomlight-primary)/20 hover:border-(--shroomlight-primary)/50'
@@ -132,87 +144,106 @@ export function ProjectsPage() {
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
                         >
                             {filteredProjects.map((project) => {
-                                const Icon = getCategoryIcon(project.category);
-                        
-                                return (
-                                    <div key={project.id} className="group relative bg-(--shroomlight-surface) rounded-2xl overflow-hidden transition-all duration-300 border border-(--shroomlight-primary)/20 hover:border-(--shroomlight-primary) hover:shadow-xl">
-                                        {/* Image */}
-                                        <div className="relative h-48 overflow-hidden">
-                                            <img
-                                                src={project.image}
-                                                alt={project.name}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                            />
-                                            <div className="absolute inset-0 bg-linear-to-t from-(--shroomlight-surface) to-transparent opacity-60" />
+                                if (project.url) {
+                                    return (
+                                        <a
+                                            key={project.id}
+                                            href={project.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group relative block bg-(--shroomlight-surface) rounded-2xl overflow-hidden transition-all duration-300 border border-(--shroomlight-primary)/20 hover:border-(--shroomlight-primary) hover:shadow-xl"
+                                        >
+                                            <ProjectCard project={project} />
+                                        </a>
+                                    );
+                                } else {
+                                    return (
+                                        <div
+                                            key={project.id}
+                                            className="group relative bg-(--shroomlight-surface) rounded-2xl overflow-hidden transition-all duration-300 border border-(--shroomlight-primary)/20 hover:border-(--shroomlight-primary) hover:shadow-xl"
+                                        >
+                                            <ProjectCard project={project} />
                                         </div>
-                                        {/* Content */}
-                                        <div className="p-6 space-y-4">
-                                            <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2 px-3 py-1 bg-(--shroomlight-glow)/20 rounded-full border border-(--shroomlight-primary)/30">
-                                                <Icon className="w-4 h-4 text-(--shroomlight-primary)" />
-                                                <span 
-                                                    className="text-sm text-(--shroomlight-accent-1)"
-                                                    style={{ fontFamily: 'var(--font-body)' }}
-                                                >
-                                                {project.category}
-                                                </span>
-                                            </div>
-                                            {project.url ? (
-                                                <a
-                                                    href={project.url} // the link you want to redirect to
-                                                    target="_blank" // opens in a new tab
-                                                    rel="noopener noreferrer" // security best practice
-                                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                                >
-                                                    <ExternalLink className="w-5 h-5 text-(--shroomlight-accent-1) opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                </a>
-                                            ) : (
-                                                <span
-                                                    className="text-xs text-(--shroomlight-accent-2) italic opacity-70"
-                                                    style={{ fontFamily: 'var(--font-body)' }}
-                                                >
-                                                    Not yet public
-                                                </span>
-                                            )}
-                                            </div>
-
-                                            <h3 
-                                                className="text-xl sm:text-2xl font-bold text-(--shroomlight-light)"
-                                                style={{ fontFamily: 'var(--font-heading)' }}
-                                            >
-                                                {project.name}
-                                            </h3>
-
-                                            <p 
-                                                className="text-(--shroomlight-accent-1) text-sm sm:text-base"
-                                                style={{ fontFamily: 'var(--font-body)' }}
-                                            >
-                                                {project.description}
-                                            </p>
-
-                                            {/* Tags */}
-                                            <div className="flex flex-wrap gap-2">
-                                                {project.tags.map((tag) => (
-                                                    <span
-                                                        key={tag}
-                                                        className="px-2 py-1 bg-(--shroomlight-bg)/50 rounded text-xs text-(--shroomlight-accent-2)"
-                                                        style={{ fontFamily: 'var(--font-body)' }}
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Glow effect on hover */}
-                                        <div className="absolute inset-0 bg-linear-to-r from-(--shroomlight-primary)/0 via-(--shroomlight-primary)/5 to-(--shroomlight-primary)/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                                    </div>
-                                );
+                                    );
+                                }
                             })}
                         </motion.div>                        
                     </AnimatePresence>
                 </motion.div>
             </div>
         </div>
+    );
+}
+
+function ProjectCard({project}: {project: Project}) {
+    const Icon = getCategoryIcon(project.category);
+
+    return (
+        <>
+            {/* Image */}
+            <div className="relative w-full h-48">
+                <Image
+                    src={project.image}
+                    alt={project.name}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    className="group-hover:scale-110 transition-transform duration-300"
+                />
+            </div>
+
+
+            {/* Content */}
+            <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-(--shroomlight-glow)/20 rounded-full border border-(--shroomlight-primary)/30">
+                        <Icon className="w-4 h-4 text-(--shroomlight-primary)" />
+                        <span
+                            className="text-sm text-(--shroomlight-accent-1)"
+                            style={{ fontFamily: 'var(--font-body)' }}
+                        >
+                            {project.category}
+                        </span>
+                    </div>
+                    {project.url.length === 0 && (
+                        <span
+                            className="text-xs text-(--shroomlight-accent-2) italic opacity-70"
+                            style={{ fontFamily: 'var(--font-body)' }}
+                        >
+                            Not yet public
+                        </span>
+                    )}
+                </div>
+
+                <h3
+                    className="text-xl sm:text-2xl font-bold text-(--shroomlight-light)"
+                    style={{ fontFamily: 'var(--font-heading)' }}
+                >
+                    {project.name}
+                </h3>
+
+                <p
+                    className="text-(--shroomlight-accent-1) text-sm sm:text-base"
+                    style={{ fontFamily: 'var(--font-body)' }}
+                >
+                    {project.description}
+                </p>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2">
+                    {project.tags.map((tag) => (
+                        <span
+                            key={tag}
+                            className="px-2 py-1 bg-(--shroomlight-bg)/50 rounded text-xs text-(--shroomlight-accent-2)"
+                            style={{ fontFamily: 'var(--font-body)' }}
+                        >
+                                                        {tag}
+                                                    </span>
+                    ))}
+                </div>
+            </div>
+
+            {/* Glow effect on hover */}
+            <div className="absolute inset-0 bg-linear-to-r from-(--shroomlight-primary)/0 via-(--shroomlight-primary)/5 to-(--shroomlight-primary)/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        </>
     );
 }
